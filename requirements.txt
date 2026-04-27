@@ -6,3 +6,4 @@ matplotlib
 seaborn
 pillow
 opencv-python-headless
+huggingface_hub
