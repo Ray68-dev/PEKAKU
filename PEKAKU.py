@@ -203,7 +203,10 @@ if not st.session_state.disclaimer_closed:
     remaining = max(0, 3 - int(elapsed))
     can_close = elapsed >= 3
 
-    st.markdown(f"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
     <div class="popup-overlay">
         <div class="popup-box">
             <span class="popup-icon">⚕️</span>
@@ -218,9 +221,11 @@ if not st.session_state.disclaimer_closed:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
     if can_close:
         if st.button("✓ Saya Mengerti"):
             st.session_state.disclaimer_closed = True
+            placeholder.empty()
             st.rerun()
     st.stop()
 
