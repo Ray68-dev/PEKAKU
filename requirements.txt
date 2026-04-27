@@ -7,3 +7,4 @@ seaborn
 pillow
 opencv-python-headless
 huggingface_hub
+streamlit-autorefresh
