@@ -64,10 +64,18 @@ section[data-testid="stSidebar"] { display: none !important; }
     text-align: center;
     animation: slideUp .35s cubic-bezier(.22,.68,0,1.15);
     pointer-events: auto;
+    padding-bottom: 70px;
+    position: relative;
 }
 @keyframes slideUp {
     from{transform:translateY(36px);opacity:0}
     to{transform:translateY(0);opacity:1}
+}
+.popup-button-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 .popup-icon  { font-size:3rem; margin-bottom:.6rem; display:block; }
 .popup-title { font-family:'Fraunces',serif; font-size:1.3rem; font-weight:700; color:#1c1c1c; margin-bottom:.7rem; }
@@ -225,10 +233,13 @@ if not st.session_state.disclaimer_closed:
     """, unsafe_allow_html=True)
 
     if can_close:
+        st.markdown('<div class="popup-button-wrapper">', unsafe_allow_html=True)
+
         if st.button("✓ Saya Mengerti"):
             st.session_state.disclaimer_closed = True
             placeholder.empty()
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
 
