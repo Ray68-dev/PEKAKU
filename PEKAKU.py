@@ -194,10 +194,15 @@ if "show_high_risk_popup" not in st.session_state:
 # ─────────────────────────────────────────────
 # DISCLAIMER POPUP  (tutup setelah 3 detik)
 # ─────────────────────────────────────────────
+from streamlit_autorefresh import st_autorefresh
+
 if not st.session_state.disclaimer_closed:
+    st_autorefresh(interval=1000, key="timer_refresh")
+
     elapsed   = time.time() - st.session_state.popup_start
     remaining = max(0, 3 - int(elapsed))
     can_close = elapsed >= 3
+
     st.markdown(f"""
     <div class="popup-overlay">
         <div class="popup-box">
