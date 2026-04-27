@@ -177,54 +177,51 @@ import streamlit as st
 import time
 
 # Inisialisasi state
+# 1. Inisialisasi nilai default di awal agar variabel selalu ada
+# 1. Pastikan inisialisasi state ada di paling atas
 if "disclaimer_closed" not in st.session_state:
     st.session_state.disclaimer_closed = False
 if "popup_start" not in st.session_state:
     st.session_state.popup_start = time.time()
 
-@st.fragment(run_every=1.0)
-def show_popup():
+# 2. Logika Popup
+if not st.session_state.disclaimer_closed:
     elapsed = time.time() - st.session_state.popup_start
     remaining = max(0, 3 - int(elapsed))
     can_close = elapsed >= 3
 
+    # Variabel untuk UI
     if not can_close:
-        st.warning(f"Mohon baca disclaimer. Aktif dalam {remaining} detik...")
-        st.button("Tutup (Tunggu...)", disabled=True)
+        timer_html = f'<div style="color: #ff4b4b; font-weight: bold;">Dapat ditutup dalam {remaining} detik...</div>'
     else:
-        if st.button("Tutup Sekarang", type="primary"):
-            st.session_state.disclaimer_closed = True
-            st.rerun()
-if not st.session_state.disclaimer_closed:
-    show_popup()
-else:
-    st.success("Disclaimer sudah ditutup! Menampilkan konten utama...")
+        timer_html = ""
 
+    # Render BOX POPUP (Gunakan satu st.markdown saja agar rapi)
     st.markdown(f"""
-    <div class="popup-overlay">
-        <div class="popup-box">
-            <span class="popup-icon">⚕️</span>
-            <div class="popup-title">Perhatian Penting</div>
-            <div class="popup-body">
+        <div style="border: 2px solid #ff4b4b; padding: 20px; border-radius: 10px; background-color: #fff1f1; margin-bottom: 10px;">
+            <span style="font-size: 2rem;">⚕️</span>
+            <div style="font-size: 1.5rem; font-weight: bold; color: #ff4b4b;">Perhatian Penting</div>
+            <div style="margin: 15px 0; color: #31333f;">
                 PEKAKU adalah alat bantu skrining awal berbasis kecerdasan buatan.<br><br>
                 <b>Hasil analisis ini BUKAN diagnosis medis.</b><br>
-                Selalu konsultasikan kondisi kulit Anda kepada dokter spesialis kulit
-                (dermatologis) untuk diagnosis dan penanganan yang tepat.
+                Selalu konsultasikan kondisi kulit Anda kepada dermatologis.
             </div>
             {timer_html}
         </div>
-    </div>
     """, unsafe_allow_html=True)
 
+    # Logika Tombol
     if can_close:
-        if st.button("✓ Saya Mengerti", key="btn_disclaimer"):
+        if st.button("✓ Saya Mengerti", key="btn_disclaimer", type="primary", use_container_width=True):
             st.session_state.disclaimer_closed = True
             st.rerun()
     else:
+        # Tampilkan tombol mati saat loading
+        st.button(f"Tunggu ({remaining}s)", disabled=True, use_container_width=True)
         time.sleep(1)
         st.rerun()
 
-    st.stop()
+    st.stop() # PENTING: Menghentikan konten utama agar tidak muncul sebelum klik "Setuju"
 
 if st.session_state.show_high_risk_popup:
     st.markdown("""
