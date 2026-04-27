@@ -173,23 +173,32 @@ section[data-testid="stSidebar"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
+import streamlit as st
+import time
+
+# Inisialisasi state
 if "disclaimer_closed" not in st.session_state:
     st.session_state.disclaimer_closed = False
 if "popup_start" not in st.session_state:
     st.session_state.popup_start = time.time()
-if "show_high_risk_popup" not in st.session_state:
-    st.session_state.show_high_risk_popup = False
 
-if not st.session_state.disclaimer_closed:
-    elapsed   = time.time() - st.session_state.popup_start
+@st.fragment(run_every=1.0)
+def show_popup():
+    elapsed = time.time() - st.session_state.popup_start
     remaining = max(0, 3 - int(elapsed))
     can_close = elapsed >= 3
 
-    timer_html = (
-        f'<div class="popup-timer">Dapat ditutup dalam <b>{remaining}</b> detik...</div>'
-        if not can_close else ""
-    )
-    btn_class = "popup-btn" if can_close else "popup-btn popup-btn-disabled"
+    if not can_close:
+        st.warning(f"Mohon baca disclaimer. Aktif dalam {remaining} detik...")
+        st.button("Tutup (Tunggu...)", disabled=True)
+    else:
+        if st.button("Tutup Sekarang", type="primary"):
+            st.session_state.disclaimer_closed = True
+            st.rerun()
+if not st.session_state.disclaimer_closed:
+    show_popup()
+else:
+    st.success("Disclaimer sudah ditutup! Menampilkan konten utama...")
 
     st.markdown(f"""
     <div class="popup-overlay">
