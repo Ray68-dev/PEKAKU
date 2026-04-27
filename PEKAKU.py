@@ -43,54 +43,6 @@ header[data-testid="stHeader"],
 [data-testid="stToolbar"],
 section[data-testid="stSidebar"] { display: none !important; }
 
-/* ── POPUP ── */
-.popup-overlay {
-    position: fixed; inset: 0;
-    background: rgba(10,10,10,0.6);
-    backdrop-filter: blur(5px);
-    z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    animation: fadeIn .25s ease;
-    pointer-events: none;
-}
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-.popup-box {
-    background: #fff;
-    border-radius: 22px;
-    padding: 2.4rem 2rem 2rem;
-    max-width: 400px; width: 92%;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.2);
-    text-align: center;
-    animation: slideUp .35s cubic-bezier(.22,.68,0,1.15);
-    pointer-events: auto;
-    padding-bottom: 70px;
-    position: relative;
-}
-@keyframes slideUp {
-    from{transform:translateY(36px);opacity:0}
-    to{transform:translateY(0);opacity:1}
-}
-.popup-button-wrapper {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-.popup-icon  { font-size:3rem; margin-bottom:.6rem; display:block; }
-.popup-title { font-family:'Fraunces',serif; font-size:1.3rem; font-weight:700; color:#1c1c1c; margin-bottom:.7rem; }
-.popup-body  { font-size:.88rem; color:#555; line-height:1.7; margin-bottom:1.2rem; }
-.popup-timer { font-size:.78rem; color:#bbb; margin-bottom:.8rem; }
-.popup-btn {
-    display: inline-block;
-    background: #c0392b; color: #fff;
-    font-family:'Outfit',sans-serif; font-weight:600; font-size:.9rem;
-    padding:.65rem 2rem; border-radius:50px; border:none;
-    cursor:pointer; transition:background .2s;
-}
-.popup-btn:hover { background:#a93226; }
-.popup-btn-disabled { background:#d5d5d5 !important; color:#aaa !important; cursor:not-allowed !important; }
-
 /* ── HEADER ── */
 .app-header { text-align:center; padding:2.5rem 1rem 1.5rem; }
 .app-logo {
@@ -207,64 +159,26 @@ if "show_high_risk_popup" not in st.session_state:
 from streamlit_autorefresh import st_autorefresh
 
 if not st.session_state.disclaimer_closed:
-    st_autorefresh(interval=1000, key="timer_refresh")
-
-    elapsed   = time.time() - st.session_state.popup_start
-    remaining = max(0, 3 - int(elapsed))
-    can_close = elapsed >= 3
-
-    placeholder = st.empty()
-
-    with placeholder.container():
-        st.markdown(f"""
-    <div class="popup-overlay">
-        <div class="popup-box">
-            <span class="popup-icon">⚕️</span>
-            <div class="popup-title">Perhatian Penting</div>
-            <div class="popup-body">
-                PEKAKU adalah alat bantu skrining awal berbasis kecerdasan buatan.<br><br>
-                <b>Hasil ini BUKAN diagnosis medis.</b>
-            </div>
-            <div class="popup-timer">
-                {"Klik tombol di bawah" if can_close else f"Tunggu {remaining} detik..."}
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if can_close:
-        st.markdown('<div class="popup-button-wrapper">', unsafe_allow_html=True)
+    with st.modal("⚕️ Perhatian Penting"):
+        st.write("PEKAKU adalah alat bantu skrining awal...")
+        st.warning("Hasil ini BUKAN diagnosis medis.")
 
         if st.button("✓ Saya Mengerti"):
             st.session_state.disclaimer_closed = True
-            placeholder.empty()
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.stop()
 
 
 # ─────────────────────────────────────────────
-# HIGH-RISK POPUP
+# HIGH-RISK MODAL
 # ─────────────────────────────────────────────
 if st.session_state.show_high_risk_popup:
-    st.markdown("""
-    <div class="popup-overlay">
-        <div class="popup-box">
-            <span class="popup-icon">🚨</span>
-            <div class="popup-title">Risiko Tinggi Terdeteksi</div>
-            <div class="popup-body">
-                Model mendeteksi <b>kemungkinan risiko kanker kulit yang tinggi</b>
-                pada gambar ini.<br><br>
-                Jangan abaikan hasil ini. Segera jadwalkan pemeriksaan dengan
-                dokter spesialis kulit sesegera mungkin.
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.modal("🚨 Risiko Tinggi Terdeteksi"):
+        st.error("Model mendeteksi kemungkinan risiko kanker kulit yang tinggi.")
+        st.write("Segera konsultasikan ke dokter spesialis kulit.")
 
-    if st.button("✓ Saya Pahami, Akan Segera Konsultasi", key="btn_highrisk"):
-        st.session_state.show_high_risk_popup = False
-        st.rerun()
+        if st.button("✓ Saya Pahami, Akan Segera Konsultasi"):
+            st.session_state.show_high_risk_popup = False
+            st.rerun()
 
     st.stop()
 
