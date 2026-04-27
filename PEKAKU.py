@@ -154,44 +154,55 @@ if "show_high_risk_popup" not in st.session_state:
 
 
 # ─────────────────────────────────────────────
-# DISCLAIMER (FALLBACK)
+# DISCLAIMER (STABLE VERSION)
 # ─────────────────────────────────────────────
 if "disclaimer_closed" not in st.session_state:
     st.session_state.disclaimer_closed = False
 
 if not st.session_state.disclaimer_closed:
+
+    # Overlay + popup (visual only)
     st.markdown("""
     <div style="
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
         z-index: 9999;
         display: flex;
         align-items: center;
         justify-content: center;
+        pointer-events: none;
     ">
         <div style="
             background: white;
             padding: 2rem;
-            border-radius: 16px;
-            max-width: 400px;
+            border-radius: 18px;
+            max-width: 420px;
+            width: 90%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            pointer-events: auto;
         ">
-            <h3>⚕️ Perhatian Penting</h3>
-            <p style="font-size:0.9rem;">
+            <h3 style="margin-bottom:10px;">⚕️ Perhatian Penting</h3>
+            <p style="font-size:0.9rem; color:#444;">
                 PEKAKU adalah alat bantu skrining awal berbasis AI.<br><br>
-                <b>Hasil ini BUKAN diagnosis medis.</b>
+                <b>Hasil ini BUKAN diagnosis medis.</b><br>
+                Konsultasikan ke dokter untuk hasil akurat.
             </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<br><br><br><br><br>")  # kasih jarak biar tombol keliatan
+    # Spacer biar tombol "terasa" di bawah popup
+    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
 
-    if st.button("✓ Saya Mengerti", use_container_width=True):
-        st.session_state.disclaimer_closed = True
-        st.rerun()
+    # Tombol (REAL BUTTON, bisa diklik)
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        if st.button("✓ Saya Mengerti", use_container_width=True):
+            st.session_state.disclaimer_closed = True
+            st.rerun()
 
     st.stop()
 
@@ -199,18 +210,53 @@ if not st.session_state.disclaimer_closed:
 # ─────────────────────────────────────────────
 # HIGH RISK ALERT
 # ─────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# HIGH RISK ALERT (STABLE VERSION)
+# ─────────────────────────────────────────────
 if st.session_state.get("show_high_risk_popup", False):
 
-    st.error("🚨 Risiko Tinggi Terdeteksi")
-    st.write("""
-    Model mendeteksi kemungkinan risiko kanker kulit yang tinggi.
+    # Overlay + popup visual
+    st.markdown("""
+    <div style="
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    ">
+        <div style="
+            background: #fff;
+            padding: 2rem;
+            border-radius: 18px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            pointer-events: auto;
+        ">
+            <h3 style="color:#c0392b; margin-bottom:10px;">🚨 Risiko Tinggi Terdeteksi</h3>
+            <p style="font-size:0.9rem; color:#444;">
+                Model mendeteksi <b>kemungkinan risiko kanker kulit yang tinggi</b>.<br><br>
+                Jangan abaikan hasil ini.<br>
+                Segera konsultasikan ke dokter spesialis kulit.
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    Segera konsultasikan ke dokter spesialis kulit.
-    """)
+    # Spacer biar tombol terasa dekat popup
+    st.markdown("<br><br><br><br><br>", unsafe_allow_html=True)
 
-    if st.button("✓ Saya Pahami, Akan Segera Konsultasi"):
-        st.session_state.show_high_risk_popup = False
-        st.rerun()
+    # Tombol konfirmasi
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        if st.button("✓ Saya Pahami, Akan Segera Konsultasi", use_container_width=True):
+            st.session_state.show_high_risk_popup = False
+            st.rerun()
 
     st.stop()
 
