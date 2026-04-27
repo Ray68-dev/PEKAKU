@@ -43,6 +43,53 @@ header[data-testid="stHeader"],
 [data-testid="stToolbar"],
 section[data-testid="stSidebar"] { display: none !important; }
 
+/* ── POPUP ── */
+.popup-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn .25s ease;
+    pointer-events: none;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.popup-box {
+    background: #fff;
+    border-radius: 22px;
+    padding: 2.4rem 2rem 2rem;
+    max-width: 400px; width: 92%;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: slideUp .35s cubic-bezier(.22,.68,0,1.15);
+    pointer-events: auto;
+    padding-bottom: 70px;
+    position: relative;
+}
+@keyframes slideUp {
+    from{transform:translateY(36px);opacity:0}
+    to{transform:translateY(0);opacity:1}
+}
+.popup-button-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.popup-icon  { font-size:3rem; margin-bottom:.6rem; display:block; }
+.popup-title { font-family:'Fraunces',serif; font-size:1.3rem; font-weight:700; color:#1c1c1c; margin-bottom:.7rem; }
+.popup-body  { font-size:.88rem; color:#555; line-height:1.7; margin-bottom:1.2rem; }
+.popup-timer { font-size:.78rem; color:#bbb; margin-bottom:.8rem; }
+.popup-btn {
+    display: inline-block;
+    background: #c0392b; color: #fff;
+    font-family:'Outfit',sans-serif; font-weight:600; font-size:.9rem;
+    padding:.65rem 2rem; border-radius:50px; border:none;
+    cursor:pointer; transition:background .2s;
+}
+.popup-btn:hover { background:#a93226; }
+.popup-btn-disabled { background:#d5d5d5 !important; color:#aaa !important; cursor:not-allowed !important; }
+
 /* ── HEADER ── */
 .app-header { text-align:center; padding:2.5rem 1rem 1.5rem; }
 .app-logo {
