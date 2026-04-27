@@ -154,65 +154,53 @@ if "show_high_risk_popup" not in st.session_state:
 
 
 # ─────────────────────────────────────────────
-# DISCLAIMER (STABLE VERSION)
+# INTRO SCREEN (DISCLAIMER PAGE)
 # ─────────────────────────────────────────────
-if "disclaimer_closed" not in st.session_state:
-    st.session_state.disclaimer_closed = False
+if "accepted" not in st.session_state:
+    st.session_state.accepted = False
 
-if not st.session_state.disclaimer_closed:
+if not st.session_state.accepted:
 
-    # Overlay + popup (visual only)
     st.markdown("""
     <div style="
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(4px);
-        z-index: 9999;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        pointer-events: none;
+        background: linear-gradient(135deg, #faf7f4, #f3ebe7);
     ">
         <div style="
             background: white;
-            padding: 2rem;
-            border-radius: 18px;
-            max-width: 420px;
+            padding: 2.5rem;
+            border-radius: 20px;
+            max-width: 480px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            pointer-events: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         ">
-            <h3 style="margin-bottom:10px;">⚕️ Perhatian Penting</h3>
-            <p style="font-size:0.9rem; color:#444;">
-                PEKAKU adalah alat bantu skrining awal berbasis AI.<br><br>
-                <b>Hasil ini BUKAN diagnosis medis.</b><br>
-                Konsultasikan ke dokter untuk hasil akurat.
+            <div style="font-size:3rem;">🩺</div>
+            <h2 style="margin: 10px 0;">PEKAKU</h2>
+            <p style="font-size:0.9rem; color:#666; line-height:1.7;">
+                Pendeteksi risiko kanker kulit berbasis AI.<br><br>
+                <b>⚠️ Ini bukan diagnosis medis.</b><br>
+                Selalu konsultasikan ke dokter spesialis kulit.
             </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Spacer biar tombol "terasa" di bawah popup
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Tombol (REAL BUTTON, bisa diklik)
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
-        if st.button("✓ Saya Mengerti", use_container_width=True):
-            st.session_state.disclaimer_closed = True
+        if st.button("🚀 Mulai Sekarang", use_container_width=True):
+            st.session_state.accepted = True
             st.rerun()
 
     st.stop()
 
 
-# ─────────────────────────────────────────────
-# HIGH RISK ALERT
-# ─────────────────────────────────────────────
-# ─────────────────────────────────────────────
-# HIGH RISK ALERT (STABLE VERSION)
-# ─────────────────────────────────────────────
+#HIGH RISK
 if st.session_state.get("show_high_risk_popup", False):
 
     # Overlay + popup visual
