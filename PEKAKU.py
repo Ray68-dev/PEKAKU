@@ -51,6 +51,7 @@ section[data-testid="stSidebar"] { display: none !important; }
     z-index: 9999;
     display: flex; align-items: center; justify-content: center;
     animation: fadeIn .25s ease;
+    pointer-events: none;
 }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
@@ -62,6 +63,7 @@ section[data-testid="stSidebar"] { display: none !important; }
     box-shadow: 0 32px 80px rgba(0,0,0,0.2);
     text-align: center;
     animation: slideUp .35s cubic-bezier(.22,.68,0,1.15);
+    pointer-events: auto;
 }
 @keyframes slideUp {
     from{transform:translateY(36px);opacity:0}
