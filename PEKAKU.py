@@ -223,28 +223,6 @@ if not st.session_state.disclaimer_closed:
 
     st.stop() # PENTING: Menghentikan konten utama agar tidak muncul sebelum klik "Setuju"
 
-if st.session_state.show_high_risk_popup:
-    st.markdown("""
-    <div class="popup-overlay">
-        <div class="popup-box">
-            <span class="popup-icon">🚨</span>
-            <div class="popup-title">Risiko Tinggi Terdeteksi</div>
-            <div class="popup-body">
-                Model mendeteksi <b>kemungkinan risiko kanker kulit yang tinggi</b>
-                pada gambar ini.<br><br>
-                Jangan abaikan hasil ini. Segera jadwalkan pemeriksaan dengan
-                dokter spesialis kulit sesegera mungkin.
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("✓ Saya Pahami, Akan Segera Konsultasi", key="btn_highrisk"):
-        st.session_state.show_high_risk_popup = False
-        st.rerun()
-
-    st.stop()
-
 @st.cache_resource(show_spinner=False)
 def load_model_hf():
     path = hf_hub_download(
@@ -402,7 +380,26 @@ if model_ok:
                 pass
 
         if st.session_state.show_high_risk_popup:
-            st.rerun()
+    st.markdown("""
+    <div class="popup-overlay">
+        <div class="popup-box">
+            <span class="popup-icon">🚨</span>
+            <div class="popup-title">Risiko Tinggi Terdeteksi</div>
+            <div class="popup-body">
+                Model mendeteksi <b>kemungkinan risiko kanker kulit yang tinggi</b>
+                pada gambar ini.<br><br>
+                Jangan abaikan hasil ini. Segera jadwalkan pemeriksaan dengan
+                dokter spesialis kulit sesegera mungkin.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("✓ Saya Pahami, Akan Segera Konsultasi", key="btn_highrisk"):
+        st.session_state.show_high_risk_popup = False
+        st.rerun()
+
+    st.stop()
 
 st.markdown("""
 <div class="app-footer">
