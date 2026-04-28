@@ -8,427 +8,557 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from PIL import Image
 import io
-import time
+import os
+import base64
 from huggingface_hub import hf_hub_download
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="PEKAKU – Pendeteksi Risiko Kanker Kulit",
-    page_icon="🩺",
+    page_title="PEKAKU — Pendeteksi Risiko Kanker Kulit",
+    page_icon="pekaku_icon.png",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# ─────────────────────────────────────────────
+# ICON BASE64
+# ─────────────────────────────────────────────
+def get_icon_b64():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pekaku_icon.png")
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return ""
+
+ICON_B64 = get_icon_b64()
+ICON_TAG = f'<img src="data:image/png;base64,{ICON_B64}" class="hero-logo" alt="Logo PEKAKU">' if ICON_B64 else ""
 
 # ─────────────────────────────────────────────
 # CSS
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; }
 
-html, body, [class*="css"] {
-    font-family: 'Outfit', sans-serif;
-    background-color: #faf7f4 !important;
-    color: #1c1c1c;
+html, body, [class*="css"], .stApp {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #0e0b18 !important;
+    color: #ede8ff !important;
 }
-.stApp { background: #faf7f4 !important; }
 
-/* Hide Streamlit chrome */
-header[data-testid="stHeader"],
-#MainMenu, footer,
-[data-testid="stToolbar"],
+header[data-testid="stHeader"], #MainMenu, footer,
+[data-testid="stToolbar"], [data-testid="stDecoration"],
+[data-testid="collapsedControl"] { display: none !important; }
+
 section[data-testid="stSidebar"] { display: none !important; }
 
-/* ── HEADER ── */
-.app-header { text-align:center; padding:2.5rem 1rem 1.5rem; }
-.app-logo {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:70px; height:70px;
-    background:linear-gradient(135deg,#e74c3c,#c0392b);
-    border-radius:20px; font-size:2.2rem; margin-bottom:1rem;
-    box-shadow:0 10px 28px rgba(192,57,43,.25);
+.block-container {
+    padding: 0 !important;
+    max-width: 820px !important;
 }
-.app-title {
-    font-family:'Fraunces',serif;
-    font-size:clamp(2rem,7vw,2.8rem);
-    font-weight:900; color:#1c1c1c; letter-spacing:-.5px;
-}
-.app-subtitle { font-size:.88rem; color:#999; font-weight:300; letter-spacing:.04em; margin-top:.3rem; }
 
-/* ── CARD ── */
+/* ── HERO ── */
+.hero {
+    background: linear-gradient(160deg, #170e32 0%, #1c1240 55%, #0e0b18 100%);
+    border-bottom: 1px solid rgba(168,85,247,0.15);
+    padding: 3.5rem 2rem 2.8rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%);
+    width:520px; height:320px;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero::after {
+    content:''; position:absolute; bottom:-60px; right:-40px;
+    width:280px; height:280px;
+    background: radial-gradient(ellipse, rgba(245,158,11,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero-logo {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 2px solid rgba(168,85,247,0.35);
+    box-shadow: 0 0 36px rgba(124,58,237,0.35), 0 0 80px rgba(124,58,237,0.12);
+    display: block; margin: 0 auto 1.3rem;
+}
+.hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    background: linear-gradient(90deg, #c084fc 0%, #f59e0b 50%, #c084fc 100%);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+.hero-sub {
+    font-size: clamp(0.78rem, 2.5vw, 0.92rem);
+    color: #8b7db0;
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+/* ── SECTIONS ── */
+.section { padding: 2rem 2rem 0; }
+.section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #6b5b90;
+    margin-bottom: 0.75rem;
+}
+
+/* ── CARDS ── */
 .card {
-    background:#fff; border-radius:20px;
-    padding:2rem 1.6rem; margin:1.2rem 0;
-    box-shadow:0 2px 18px rgba(0,0,0,.06);
-    border:1px solid rgba(0,0,0,.05);
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(168,85,247,0.12);
+    border-radius: 18px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.1rem;
+    line-height: 1.75;
+    font-size: 0.92rem;
+    color: #c0b4e0;
+}
+.card b { color: #ddd0ff; }
+
+/* ── WARNING ── */
+.warn {
+    background: linear-gradient(135deg, rgba(245,158,11,0.09), rgba(180,100,0,0.05));
+    border: 1px solid rgba(245,158,11,0.25);
+    border-left: 4px solid #f59e0b;
+    border-radius: 14px;
+    padding: 1.1rem 1.4rem;
+    font-size: 0.87rem;
+    color: #d4b870;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+.warn-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-bottom: 0.35rem;
 }
 
-/* ── UPLOAD PLACEHOLDER ── */
-.upload-placeholder {
-    text-align:center; padding:2rem 1rem; color:#ccc;
+/* ── STEPS ── */
+.steps {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
 }
-.upload-placeholder .ph-icon { font-size:2.8rem; }
-.upload-placeholder p { font-size:.85rem; margin-top:.5rem; }
+.step {
+    flex: 1; min-width: 130px;
+    background: rgba(124,58,237,0.07);
+    border: 1px solid rgba(124,58,237,0.16);
+    border-radius: 14px;
+    padding: 1rem 0.9rem;
+    text-align: center;
+}
+.step-n {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #a855f7, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.step-t { font-size: 0.78rem; color: #9480c0; margin-top: 0.25rem; line-height: 1.4; }
 
-/* ── RESULT ── */
-.result-card {
-    border-radius:18px; padding:1.8rem 1.4rem;
-    text-align:center; margin-bottom:1rem;
+/* ── DIVIDER ── */
+.div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168,85,247,0.15), transparent);
+    margin: 1.8rem 2rem;
 }
-.result-high { background:linear-gradient(135deg,#fff5f5,#ffe8e6); border:1.5px solid #f5c6c2; }
-.result-low  { background:linear-gradient(135deg,#f0fff8,#ddf5eb); border:1.5px solid #b2e4cc; }
-.result-emoji { font-size:3rem; display:block; margin-bottom:.5rem; }
-.result-label {
-    font-family:'Fraunces',serif; font-size:1.45rem; font-weight:700; margin-bottom:.3rem;
-}
-.result-high .result-label { color:#c0392b; }
-.result-low  .result-label { color:#1a7a4a; }
-.result-conf {
-    font-size:2.6rem; font-weight:700; letter-spacing:-1px; margin:.3rem 0;
-}
-.result-high .result-conf { color:#e74c3c; }
-.result-low  .result-conf { color:#27ae60; }
-.result-note { font-size:.82rem; color:#777; line-height:1.6; margin-top:.5rem; }
 
-/* ── GRADCAM ── */
-.gradcam-label {
-    font-family:'Fraunces',serif; font-weight:700;
-    font-size:.95rem; color:#555; margin-bottom:.6rem;
+/* ── UPLOAD ── */
+.upload-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ddd0ff;
+    margin-bottom: 1rem;
 }
-.gradcam-note { font-size:.76rem; color:#bbb; margin-top:.5rem; }
 
-/* ── BUTTON ── */
+[data-testid="stFileUploader"] {
+    background: rgba(124,58,237,0.05) !important;
+    border: 2px dashed rgba(124,58,237,0.22) !important;
+    border-radius: 16px !important;
+}
+[data-testid="stFileUploader"]:hover {
+    border-color: rgba(245,158,11,0.35) !important;
+    background: rgba(245,158,11,0.03) !important;
+}
+
 .stButton > button {
-    width:100%;
-    background:linear-gradient(135deg,#e74c3c,#c0392b);
-    color:#fff !important;
-    font-family:'Outfit',sans-serif; font-weight:600; font-size:1rem;
-    border:none; border-radius:50px; padding:.8rem 2rem;
-    box-shadow:0 6px 20px rgba(192,57,43,.28);
-    transition:all .2s; margin-top:.4rem;
+    background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+    color: #fff !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.72rem 2rem !important;
+    width: 100% !important;
+    letter-spacing: 0.04em !important;
+    box-shadow: 0 4px 22px rgba(124,58,237,0.35) !important;
+    transition: all 0.2s !important;
 }
 .stButton > button:hover {
-    transform:translateY(-2px);
-    box-shadow:0 10px 28px rgba(192,57,43,.35);
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 30px rgba(124,58,237,0.5) !important;
 }
 
-/* ── FILE UPLOADER ── */
-[data-testid="stFileUploader"] {
-    background:#fdf7f5 !important;
-    border:2px dashed #e5d8d3 !important;
-    border-radius:14px !important;
-    transition:border-color .2s;
+/* ── RESULTS ── */
+.res-card {
+    border-radius: 20px;
+    padding: 1.8rem 2rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+    overflow: hidden;
 }
-[data-testid="stFileUploader"]:hover { border-color:#e74c3c !important; }
+.res-high {
+    background: linear-gradient(135deg, rgba(220,38,38,0.11), rgba(160,20,20,0.05));
+    border: 1px solid rgba(220,38,38,0.28);
+    border-top: 3px solid #ef4444;
+}
+.res-low {
+    background: linear-gradient(135deg, rgba(34,197,94,0.09), rgba(16,140,60,0.05));
+    border: 1px solid rgba(34,197,94,0.26);
+    border-top: 3px solid #22c55e;
+}
+.res-badge {
+    display: inline-block;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.7rem;
+    border-radius: 100px;
+    margin-bottom: 0.75rem;
+}
+.b-high { background: rgba(239,68,68,0.13); color: #f87171; border: 1px solid rgba(239,68,68,0.28); }
+.b-low  { background: rgba(34,197,94,0.11); color: #4ade80; border: 1px solid rgba(34,197,94,0.28); }
+.res-label {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 800;
+    color: #f0eaff;
+    margin-bottom: 0.25rem;
+}
+.res-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 7vw, 3rem);
+    font-weight: 800;
+    line-height: 1;
+}
+.res-high .res-pct { color: #f87171; }
+.res-low  .res-pct { color: #4ade80; }
+.res-desc { font-size: 0.87rem; color: #9880c0; margin-top: 0.6rem; line-height: 1.65; }
+.pills {
+    display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.9rem;
+}
+.pill {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.78rem;
+    color: #9880c0;
+}
+.pill b { color: #ddd0ff; font-family: 'Syne', sans-serif; }
+
+.gc-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #c084fc;
+    margin-bottom: 0.7rem;
+}
+.gc-desc { font-size: 0.79rem; color: #6b5b90; margin-top: 0.45rem; line-height: 1.55; }
+
+/* ── IMAGE ── */
+[data-testid="stImage"] img {
+    border-radius: 14px !important;
+    border: 1px solid rgba(168,85,247,0.14) !important;
+}
 
 /* ── FOOTER ── */
-.app-footer {
-    text-align:center; padding:2rem 1rem 3.5rem;
-    font-size:.78rem; color:#ccc;
+.footer {
+    text-align: center;
+    padding: 2.5rem 1.5rem 3.5rem;
+    color: #3d3260;
+    font-size: 0.76rem;
+    border-top: 1px solid rgba(168,85,247,0.08);
+    margin-top: 2rem;
+    line-height: 1.9;
 }
 
 /* ── MOBILE ── */
-@media(max-width:600px){
-    .card        { padding:1.4rem 1.1rem; }
-    .result-card { padding:1.4rem 1rem; }
-    .popup-box   { padding:1.8rem 1.2rem 1.6rem; }
-    .app-header  { padding-top:1.5rem; }
+@media (max-width: 620px) {
+    .hero { padding: 2.5rem 1.2rem 2rem; }
+    .section { padding: 1.5rem 1.2rem 0; }
+    .div { margin: 1.5rem 1.2rem; }
+    .steps { gap: 0.5rem; }
+    .step { min-width: 110px; padding: 0.75rem 0.6rem; }
+    .res-card { padding: 1.4rem 1.3rem; }
+    .pills { gap: 0.45rem; }
+    .pill { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
 }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
-# SESSION STATE
+# HERO
 # ─────────────────────────────────────────────
-if "disclaimer_closed" not in st.session_state:
-    st.session_state.disclaimer_closed = False
-if "popup_start" not in st.session_state:
-    st.session_state.popup_start = time.time()
-if "show_high_risk_popup" not in st.session_state:
-    st.session_state.show_high_risk_popup = False
+st.markdown(f"""
+<div class="hero">
+    {ICON_TAG}
+    <div class="hero-title">PEKAKU</div>
+    <div class="hero-sub">Pendeteksi Risiko Kanker Kulit</div>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
-# INTRO SCREEN (DISCLAIMER PAGE)
+# INTRO
 # ─────────────────────────────────────────────
-if "accepted" not in st.session_state:
-    st.session_state.accepted = False
+st.markdown("""
+<div class="section">
+    <div class="section-label">Tentang Aplikasi</div>
+    <div class="card">
+        <b>PEKAKU</b> adalah sistem skrining berbasis kecerdasan buatan yang membantu mendeteksi
+        potensi risiko kanker kulit dari gambar lesi atau bercak pada kulit.
+        Sistem ini menggunakan model <b>EfficientNet-B0</b> yang telah dilatih untuk mengenali
+        karakteristik visual lesi berisiko tinggi maupun rendah, dilengkapi visualisasi
+        <b>Grad-CAM</b> untuk menunjukkan area yang menjadi fokus analisis AI.
+    </div>
 
-if not st.session_state.accepted:
-
-    st.markdown("""
-    <div style="
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #faf7f4, #f3ebe7);
-    ">
-        <div style="
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            max-width: 480px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        ">
-            <div style="font-size:3rem;">🩺</div>
-            <h2 style="margin: 10px 0;">PEKAKU</h2>
-            <p style="font-size:0.9rem; color:#666; line-height:1.7;">
-                Pendeteksi risiko kanker kulit berbasis AI.<br><br>
-                <b>⚠️ Ini bukan diagnosis medis.</b><br>
-                Selalu konsultasikan ke dokter spesialis kulit.
-            </p>
+    <div class="section-label">Cara Menggunakan</div>
+    <div class="steps">
+        <div class="step">
+            <div class="step-n">01</div>
+            <div class="step-t">Unggah foto lesi atau bercak kulit</div>
+        </div>
+        <div class="step">
+            <div class="step-n">02</div>
+            <div class="step-t">Klik tombol Analisis Risiko</div>
+        </div>
+        <div class="step">
+            <div class="step-n">03</div>
+            <div class="step-t">Lihat hasil & visualisasi AI</div>
+        </div>
+        <div class="step">
+            <div class="step-n">04</div>
+            <div class="step-t">Konsultasikan ke dokter kulit</div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        if st.button("🚀 Mulai Sekarang", use_container_width=True):
-            st.session_state.accepted = True
-            st.rerun()
-
-    st.stop()
-
-
-#HIGH RISK
-if st.session_state.get("show_high_risk_popup", False):
-
-    # Overlay + popup visual
-    st.markdown("""
-    <div style="
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(4px);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-    ">
-        <div style="
-            background: #fff;
-            padding: 2rem;
-            border-radius: 18px;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            pointer-events: auto;
-        ">
-            <h3 style="color:#c0392b; margin-bottom:10px;">🚨 Risiko Tinggi Terdeteksi</h3>
-            <p style="font-size:0.9rem; color:#444;">
-                Model mendeteksi <b>kemungkinan risiko kanker kulit yang tinggi</b>.<br><br>
-                Jangan abaikan hasil ini.<br>
-                Segera konsultasikan ke dokter spesialis kulit.
-            </p>
-        </div>
+    <div class="warn">
+        <div class="warn-title">⚠️ Perhatian Penting — Baca Sebelum Menggunakan</div>
+        PEKAKU adalah alat bantu skrining awal, <b>bukan alat diagnosis medis</b>. Hasil analisis
+        AI tidak dapat menggantikan pemeriksaan langsung oleh dokter. Akurasi dipengaruhi oleh
+        kualitas foto, sudut pengambilan gambar, dan kondisi pencahayaan.<br><br>
+        Jika hasil menunjukkan <b>risiko tinggi</b>, atau kamu menemukan perubahan pada kulit seperti
+        bercak baru, warna tidak merata, tepi tidak beraturan, atau ukuran yang membesar —
+        <b>jangan tunda, segera konsultasikan ke dokter spesialis kulit (dermatologis)</b>
+        untuk evaluasi dan penanganan yang tepat.
     </div>
-    """, unsafe_allow_html=True)
-
-    # Spacer biar tombol terasa dekat popup
-    st.markdown("<br><br><br><br><br>", unsafe_allow_html=True)
-
-    # Tombol konfirmasi
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        if st.button("✓ Saya Pahami, Akan Segera Konsultasi", use_container_width=True):
-            st.session_state.show_high_risk_popup = False
-            st.rerun()
-
-    st.stop()
+</div>
+<div class="div"></div>
+""", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
-# LOAD MODEL FROM HUGGING FACE
+# LOAD MODEL
 # ─────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
-def load_model_hf():
-    path = hf_hub_download(
-        repo_id="Ray-68/PEKAKU_01",
-        filename="PEKAKU_0.1_model.keras"  # ← sesuaikan nama file di repo HF kamu
-    )
+def load_model():
+    path = hf_hub_download(repo_id="Ray-68/PEKAKU_01", filename="PEKAKU_0.1_model.keras")
     return tf.keras.models.load_model(path, compile=False)
 
+with st.spinner("⏳ Memuat model AI dari Hugging Face..."):
+    try:
+        model = load_model()
+    except Exception as e:
+        st.error(f"❌ Gagal memuat model: {e}")
+        st.stop()
+
 
 # ─────────────────────────────────────────────
-# HELPER FUNCTIONS
+# HELPERS
 # ─────────────────────────────────────────────
-def preprocess_image(image_pil):
-    img_rgb  = np.array(image_pil.convert("RGB").resize((224, 224)))
-    img_bgr  = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-    arr      = preprocess_input(img_rgb.astype(np.float32).copy())
-    arr      = np.expand_dims(arr, axis=0)
-    return arr, img_bgr, img_rgb
+THRESHOLD = 0.31
 
+def preprocess_image(pil_img):
+    img_rgb = np.array(pil_img.convert("RGB").resize((224, 224)))
+    img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+    arr = preprocess_input(img_rgb.astype(np.float32).copy())
+    return np.expand_dims(arr, axis=0), img_bgr
 
-def make_gradcam_heatmap(img_array, model, last_conv="top_conv"):
+def make_gradcam(img_array, model, conv_layer="top_conv"):
     base = model.get_layer("efficientnetb0")
-    grad_model = tf.keras.Model(
-        inputs=base.input,
-        outputs=[base.get_layer(last_conv).output, base.output]
-    )
-    img_t = tf.cast(img_array, tf.float32)
+    gm = tf.keras.Model(inputs=base.input,
+                        outputs=[base.get_layer(conv_layer).output, base.output])
+    t = tf.cast(img_array, tf.float32)
     with tf.GradientTape() as tape:
-        conv_out, _ = grad_model(img_t, training=False)
+        conv_out, _ = gm(t, training=False)
         tape.watch(conv_out)
-        x = conv_out; found = False
+        x = conv_out
+        found = False
         for layer in base.layers:
             if found: x = layer(x, training=False)
-            if layer.name == last_conv: found = True
-        x = model.get_layer("global_average_pooling2d")(x, training=False)
-        x = model.get_layer("batch_normalization")(x, training=False)
-        x = model.get_layer("dense")(x, training=False)
-        x = model.get_layer("dropout")(x, training=False)
-        x = model.get_layer("dense_1")(x, training=False)
+            if layer.name == conv_layer: found = True
+        for name in ["global_average_pooling2d","batch_normalization","dense","dropout","dense_1"]:
+            x = model.get_layer(name)(x, training=False)
         loss = x[:, 0]
     grads = tape.gradient(loss, conv_out)
-    if grads is None: return None
-    pg       = tf.reduce_mean(grads, axis=(0,1,2))
-    heatmap  = conv_out[0] @ pg[..., tf.newaxis]
-    heatmap  = tf.squeeze(heatmap)
-    heatmap  = tf.maximum(heatmap, 0) / (tf.reduce_max(heatmap) + 1e-8)
-    return heatmap.numpy()
+    if grads is None: raise ValueError("Gradien None.")
+    pg = tf.reduce_mean(grads, axis=(0,1,2))
+    hm = conv_out[0] @ pg[..., tf.newaxis]
+    hm = tf.squeeze(hm)
+    hm = tf.maximum(hm, 0) / (tf.reduce_max(hm) + 1e-8)
+    return hm.numpy()
 
-
-def gradcam_figure(img_bgr, heatmap, alpha=0.4):
+def make_gradcam_figure(img_bgr, heatmap, alpha=0.4):
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-    h_res   = cv2.resize(heatmap, (img_rgb.shape[1], img_rgb.shape[0]))
-    h_col   = cv2.applyColorMap(np.uint8(255*h_res), cv2.COLORMAP_JET)
-    h_col   = cv2.cvtColor(h_col, cv2.COLOR_BGR2RGB)
-    over    = cv2.addWeighted(img_rgb, 1-alpha, h_col, alpha, 0)
-
-    fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
-    fig.patch.set_facecolor("#ffffff")
-    for ax, img, title, cmap in zip(
-        axes,
-        [img_rgb, h_res, over],
-        ["Gambar Asli", "Heatmap", "Overlay"],
-        [None, "jet", None]
-    ):
-        ax.imshow(img, cmap=cmap); ax.set_title(title, fontsize=9, color="#888", pad=6); ax.axis("off")
-    plt.tight_layout(pad=1)
+    h = cv2.resize(heatmap, (224, 224))
+    hc = cv2.applyColorMap(np.uint8(255*h), cv2.COLORMAP_JET)
+    hc = cv2.cvtColor(hc, cv2.COLOR_BGR2RGB)
+    ov = cv2.addWeighted(img_rgb, 1-alpha, hc, alpha, 0)
+    fig, axes = plt.subplots(1, 3, figsize=(11, 3.8))
+    fig.patch.set_facecolor("#110c22")
+    for ax, im, title, cmap in zip(axes,
+        [img_rgb, h, ov],
+        ["Gambar Asli", "Peta Panas", "Overlay"],
+        [None, "jet", None]):
+        ax.imshow(im, cmap=cmap)
+        ax.set_title(title, color="#9480c0", fontsize=9.5, pad=6, fontweight="bold")
+        ax.axis("off")
+    plt.tight_layout(pad=1.0)
     buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=130, bbox_inches="tight", facecolor="#fff")
-    plt.close(fig); buf.seek(0)
+    plt.savefig(buf, format="png", dpi=150, bbox_inches="tight", facecolor="#110c22")
+    plt.close(fig)
+    buf.seek(0)
     return buf
 
 
 # ─────────────────────────────────────────────
-# MAIN UI
+# UPLOAD
 # ─────────────────────────────────────────────
+st.markdown('<div class="section">', unsafe_allow_html=True)
+st.markdown('<div class="upload-title">📤 Unggah Gambar Kulit</div>', unsafe_allow_html=True)
 
-# Header
-st.markdown("""
-<div class="app-header">
-    <div class="app-logo">🩺</div>
-    <div class="app-title">PEKAKU</div>
-    <div class="app-subtitle">Pendeteksi Risiko Kanker Kulit</div>
-</div>
-""", unsafe_allow_html=True)
+uploaded = st.file_uploader(
+    "Format yang didukung: JPG, JPEG, PNG",
+    type=["jpg", "jpeg", "png"],
+    label_visibility="visible"
+)
 
-# Load model
-with st.spinner("Memuat model AI dari Hugging Face..."):
-    try:
-        model    = load_model_hf()
-        model_ok = True
-    except Exception as e:
-        st.error(f"❌ Gagal memuat model: {e}")
-        st.info("Pastikan nama file `.keras` di repo `Ray-68/PEKAKU_01` sudah benar, lalu refresh halaman.")
-        model_ok = False
+if uploaded:
+    image = Image.open(uploaded)
+    st.image(image, use_column_width=True, caption=f"🖼 {uploaded.name}")
+    st.markdown("<br>", unsafe_allow_html=True)
+    do_analyze = st.button("🔍 Analisis Risiko Sekarang")
+else:
+    do_analyze = False
 
-if model_ok:
-    # Upload card
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-    uploaded = st.file_uploader(
-        "upload",
-        type=["jpg", "jpeg", "png"],
-        label_visibility="collapsed"
+
+# ─────────────────────────────────────────────
+# RESULT
+# ─────────────────────────────────────────────
+if uploaded and do_analyze:
+    st.markdown('<div class="div"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section">', unsafe_allow_html=True)
+
+    with st.spinner("Menganalisis gambar..."):
+        img_array, img_bgr = preprocess_image(image)
+        pred = model.predict(img_array, verbose=0)[0][0]
+
+    pct       = pred * 100
+    is_high   = pred >= THRESHOLD
+    card_cls  = "res-high" if is_high else "res-low"
+    badge_cls = "b-high" if is_high else "b-low"
+    badge_txt = "⚠ Risiko Tinggi" if is_high else "✓ Risiko Rendah"
+    label     = "Risiko Tinggi Terdeteksi" if is_high else "Risiko Rendah Terdeteksi"
+    desc = (
+        "Model mendeteksi karakteristik visual yang berkaitan dengan lesi kanker kulit. "
+        "Segera konsultasikan ke dokter spesialis kulit untuk pemeriksaan lebih lanjut."
+        if is_high else
+        "Tidak ditemukan pola signifikan yang mencirikan kanker kulit pada gambar ini. "
+        "Tetap lakukan pemeriksaan kulit secara rutin dan jaga kesehatan kulitmu."
     )
 
-    if uploaded:
-        image = Image.open(uploaded)
-        st.image(image, use_column_width=True, caption=f"📎 {uploaded.name}")
-        run_btn = st.button("🔍 Periksa Sekarang")
-    else:
-        st.markdown("""
-        <div class="upload-placeholder">
-            <div class="ph-icon">📷</div>
-            <p>Seret gambar ke sini atau klik untuk memilih</p>
-            <p style="font-size:.76rem;color:#ddd;margin-top:.3rem;">Format: JPG · JPEG · PNG</p>
+    st.markdown(f"""
+    <div class="res-card {card_cls}">
+        <span class="res-badge {badge_cls}">{badge_txt}</span>
+        <div class="res-label">{label}</div>
+        <div class="res-pct">{pct:.1f}%</div>
+        <div class="res-desc">{desc}</div>
+        <div class="pills">
+            <div class="pill">Skor: <b>{pred:.4f}</b></div>
+            <div class="pill">Threshold: <b>{THRESHOLD}</b></div>
+            <div class="pill">Model: <b>EfficientNet-B0</b></div>
         </div>
-        """, unsafe_allow_html=True)
-        run_btn = False
+    </div>
+    """, unsafe_allow_html=True)
 
+    # Grad-CAM
+    st.markdown('<div class="gc-title">🔥 Visualisasi Area Perhatian AI (Grad-CAM)</div>', unsafe_allow_html=True)
+    with st.spinner("Membuat visualisasi Grad-CAM..."):
+        try:
+            heatmap = make_gradcam(img_array, model)
+            fig_buf = make_gradcam_figure(img_bgr, heatmap)
+            st.image(fig_buf, use_column_width=True)
+            st.markdown("""
+            <div class="gc-desc">
+                🔴 <b>Area merah/hangat</b> = bagian yang paling mempengaruhi keputusan model. &nbsp;
+                🔵 <b>Biru/dingin</b> = pengaruh rendah. Visualisasi ini membantu memahami fokus analisis AI.
+            </div>
+            """, unsafe_allow_html=True)
+        except Exception as e:
+            st.warning(f"Visualisasi Grad-CAM tidak tersedia: {e}")
+
+    # Follow-up warning
+    st.markdown("""
+    <div class="warn" style="margin-top:1.3rem;">
+        <div class="warn-title">🩺 Langkah Selanjutnya</div>
+        Hasil di atas adalah <b>skrining awal berbasis AI</b> dan bukan diagnosis medis final.
+        Apapun hasilnya, jika kamu menemukan perubahan mencurigakan pada kulit —
+        seperti bercak baru, perubahan warna atau bentuk, tepi tidak rata, atau terasa gatal/berdarah —
+        <b>segera periksakan diri ke dokter spesialis kulit (dermatologis)</b>
+        untuk mendapatkan evaluasi klinis yang akurat dan penanganan yang tepat waktu.
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── ANALISIS ──
-    if uploaded and run_btn:
-        with st.spinner("Menganalisis gambar..."):
-            arr, img_bgr, _ = preprocess_image(image)
-            pred      = model.predict(arr, verbose=0)[0][0]
-            THRESHOLD = 0.31
-            is_high   = pred >= THRESHOLD
-            conf      = (pred if is_high else 1 - pred) * 100
 
-        if is_high:
-            st.markdown(f"""
-            <div class="result-card result-high">
-                <span class="result-emoji">⚠️</span>
-                <div class="result-label">Risiko Tinggi</div>
-                <div class="result-conf">{conf:.1f}%</div>
-                <div class="result-note">
-                    Model mendeteksi kemungkinan kanker kulit.<br>
-                    <b>Segera konsultasikan ke dokter spesialis kulit.</b>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            st.session_state.show_high_risk_popup = True
-        else:
-            st.markdown(f"""
-            <div class="result-card result-low">
-                <span class="result-emoji">✅</span>
-                <div class="result-label">Risiko Rendah</div>
-                <div class="result-conf">{conf:.1f}%</div>
-                <div class="result-note">
-                    Tidak terdeteksi tanda risiko tinggi pada gambar ini.<br>
-                    Tetap lakukan pemeriksaan rutin ke dokter kulit.
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Grad-CAM
-        with st.spinner("Membuat visualisasi area fokus..."):
-            try:
-                heatmap = make_gradcam_heatmap(arr, model)
-                if heatmap is not None:
-                    fig_buf = gradcam_figure(img_bgr, heatmap)
-                    st.markdown('<div class="card">', unsafe_allow_html=True)
-                    st.markdown('<div class="gradcam-label">🔥 Area Fokus Model (Grad-CAM)</div>', unsafe_allow_html=True)
-                    st.image(fig_buf, use_column_width=True)
-                    st.markdown('<div class="gradcam-note">Area merah = bagian yang paling mempengaruhi prediksi model.</div>', unsafe_allow_html=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-            except Exception:
-                pass  # Grad-CAM opsional
-
-        if st.session_state.show_high_risk_popup:
-            st.rerun()
-
-# Footer
-st.markdown("""
-<div class="app-footer">
-    PEKAKU · Pendeteksi Risiko Kanker Kulit<br>
-    Hasil bukan pengganti diagnosis medis profesional
+# ─────────────────────────────────────────────
+# FOOTER
+# ─────────────────────────────────────────────
+footer_icon = f'<img src="data:image/png;base64,{ICON_B64}" style="width:28px;height:28px;border-radius:50%;opacity:0.45;vertical-align:middle;margin-right:6px;">' if ICON_B64 else ""
+st.markdown(f"""
+<div class="footer">
+    {footer_icon}<b style="color:#5c4a8a;">PEKAKU</b> — Pendeteksi Risiko Kanker Kulit<br>
+    Ditenagai oleh TensorFlow &amp; EfficientNet-B0 · Dibuat dengan Streamlit<br>
+    <span>Hasil analisis bukan pengganti diagnosis medis profesional.</span>
 </div>
 """, unsafe_allow_html=True)
