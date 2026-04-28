@@ -1,10 +1,6 @@
-streamlit
+streamlit>=1.35.0
 tensorflow
-numpy
-pandas
-matplotlib
-seaborn
-pillow
 opencv-python-headless
+matplotlib
+pillow
 huggingface_hub
-streamlit-autorefresh
