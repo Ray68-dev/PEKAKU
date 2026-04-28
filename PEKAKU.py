@@ -136,7 +136,7 @@ st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
 def load_model():
-    path = hf_hub_download(repo_id="Ray-68/PEKAKU_01", filename="skin_cancer_model.keras")
+    path = hf_hub_download(repo_id="Ray-68/PEKAKU_01", filename="PEKAKU_0.1_model.keras")
     return tf.keras.models.load_model(path, compile=False)
 
 with st.spinner("Memuat model AI dari Hugging Face..."):
