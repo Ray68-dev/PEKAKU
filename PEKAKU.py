@@ -300,21 +300,20 @@ if uploaded and do_analyze:
     st.markdown('<div class="section">', unsafe_allow_html=True)
 
     with st.spinner("Menganalisis gambar..."):
-        img_array, img_bgr = preprocess_image(image)
-        pred = model.predict(img_array, verbose=0)[0][0]
+    img_array, img_bgr = preprocess_image(image)
+    pred = model.predict(img_array, verbose=0)[0][0]
 
-        pct = pred * 100
-        is_high = pred >= THRESHOLD
-        result_label = "high_risk" if is_high else "low_risk"
+    pct = pred * 100
+    is_high = pred >= THRESHOLD
+    result_label = "high_risk" if is_high else "low_risk"
 
-        log_event(
-            event="analyze",
-            result=result_label,
-            score=float(pred),
-            percent=float(pct)
+    log_event(
+        event="analyze",
+        result=result_label,
+        score=float(pred),
+        percent=float(pct)
+    )
         
-)
-)
     pct      = pred * 100
     is_high  = pred >= THRESHOLD
     card_cls = "res-high" if is_high else "res-low"
