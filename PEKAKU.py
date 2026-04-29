@@ -14,6 +14,7 @@ from huggingface_hub import hf_hub_download
 import gspread
 from google.oauth2.service_account import Credentials
 import datetime
+import uuid
 
 def log_visit():
     try:
@@ -35,6 +36,28 @@ def connect_sheets():
     )
     client = gspread.authorize(creds)
     return client.open("Histori_Kunjungan_PEKAKU").sheet1
+
+# log analisis sheets
+def log_analyze(pred, threshold):
+    try:
+        sheet = connect_sheets()
+
+        result = "high_risk" if pred >= threshold else "low_risk"
+        score = float(pred)
+        percent = score * 100
+
+        sheet.append_row([
+            str(datetime.datetime.now()),   # timestamp
+            "analyze",                      # event
+            result,                         # hasil klasifikasi
+            f"{score:.4f}",                 # skor (0–1)
+            f"{percent:.2f}%",              # persen
+            st.session_state.user_id        # UUID user
+        ])
+
+    except Exception as e:
+        st.error(f"Gagal log analyze: {e}")
+        
 # ─────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────
@@ -45,6 +68,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# UUID
+if "user_id" not in st.session_state:
+    st.session_state.user_id = str(uuid.uuid4())
+    
 # Auto log visit
 if "logged" not in st.session_state:
     try:
@@ -321,7 +348,8 @@ if uploaded and do_analyze:
     st.markdown('<div class="warn" style="margin-top:1.3rem;"><div class="warn-title">&#129658; Langkah Selanjutnya</div>Hasil di atas adalah <b>skrining awal berbasis AI</b> dan bukan diagnosis medis final. Jika kamu menemukan perubahan mencurigakan pada kulit, <b>segera periksakan diri ke dokter spesialis kulit (dermatologis)</b> untuk mendapatkan evaluasi klinis yang akurat.</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
+log_analyze(pred, THRESHOLD)
 # ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
