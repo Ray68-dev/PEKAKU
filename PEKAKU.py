@@ -35,7 +35,8 @@ def connect_sheets():
         ]
     )
     client = gspread.authorize(creds)
-    return client.open("Histori Kunjungan PEKAKU").sheet1def connect_sheets():
+    return client.open("Histori Kunjungan PEKAKU").sheet1
+    def connect_sheets():
     creds = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=[
