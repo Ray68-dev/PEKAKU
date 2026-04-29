@@ -319,7 +319,7 @@ if uploaded and do_analyze:
     with st.spinner("Menganalisis gambar..."):
         img_array, img_bgr = preprocess_image(image)
         pred = model.predict(img_array, verbose=0)[0][0]
-
+        log_analyze(pred, THRESHOLD)
     pct      = pred * 100
     is_high  = pred >= THRESHOLD
     card_cls = "res-high" if is_high else "res-low"
@@ -349,7 +349,7 @@ if uploaded and do_analyze:
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-log_analyze(pred, THRESHOLD)
+
 # ─────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────
