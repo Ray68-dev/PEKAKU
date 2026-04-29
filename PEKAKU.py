@@ -22,6 +22,8 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+
 st.markdown("""
 <iframe srcdoc="
 <script async src='https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38'></script>
