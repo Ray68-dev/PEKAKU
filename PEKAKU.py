@@ -12,16 +12,6 @@ import os
 import base64
 from huggingface_hub import hf_hub_download
 
-st.components.v1.html("""
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-NNTWNYRC38');
-</script>
-""", height=0)
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
@@ -32,7 +22,15 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-NNTWNYRC38');
+</script>
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
