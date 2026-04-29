@@ -46,7 +46,6 @@ st.set_page_config(
 )
 st.markdown(f'''
 <div class="hero">
-    {ICON_TAG}
     <div class="hero-title">PEKAKU</div>
     <div class="hero-sub">Pendeteksi Risiko Kanker Kulit</div>
 
