@@ -44,14 +44,25 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-if st.button("TEST SHEETS"):
-    try:
-        sheet = connect_sheets()
-        sheet.append_row(["TEST", "OK"])
-        st.success("Berhasil nulis ke Sheets!")
-    except Exception as e:
-        st.error(f"Gagal: {e}")
-
+st.markdown("""
+<div style="text-align:center; margin-top:1rem;">
+    <a href="https://drive.google.com/file/d/14SgbBqAyLyjri9xm41EmP9WD_Fxk7kyT/view?usp=sharing" target="_blank">
+        <button style="
+            background: linear-gradient(135deg,#f59e0b,#fbbf24);
+            color: #1a0f00;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(245,158,11,0.4);
+        ">
+        Baca Panduan
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
 # Auto log visit
 if "logged" not in st.session_state:
     try:
