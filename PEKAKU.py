@@ -35,7 +35,7 @@ def connect_sheets():
         ]
     )
     client = gspread.authorize(creds)
-    return client.open("Histori Kunjungan PEKAKU").sheet1
+    return client.open("Histori_Kunjungan_PEKAKU").sheet1
 # ─────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────
