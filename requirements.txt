@@ -4,3 +4,5 @@ opencv-python-headless
 matplotlib
 pillow
 huggingface_hub
+gspread
+google-auth
