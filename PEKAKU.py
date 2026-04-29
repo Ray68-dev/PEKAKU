@@ -312,35 +312,30 @@ if uploaded and do_analyze:
             score=float(pred),
             percent=float(pct)
       )
-        
-    pct      = pred * 100
-    is_high  = pred >= THRESHOLD
-    card_cls = "res-high" if is_high else "res-low"
-    bdg_cls  = "b-high" if is_high else "b-low"
-    bdg_txt  = "&#9888; Risiko Tinggi" if is_high else "&#10003; Risiko Rendah"
-    label    = "Risiko Tinggi Terdeteksi" if is_high else "Risiko Rendah Terdeteksi"
-    desc     = (
-        "Model mendeteksi karakteristik visual yang berkaitan dengan lesi kanker kulit. Segera konsultasikan ke dokter spesialis kulit untuk pemeriksaan lebih lanjut."
-        if is_high else
-        "Tidak ditemukan pola signifikan yang mencirikan kanker kulit pada gambar ini. Tetap lakukan pemeriksaan kulit secara rutin dan jaga kesehatan kulitmu."
-    )
-
-    st.markdown(f'<div class="res-card {card_cls}"><span class="res-badge {bdg_cls}">{bdg_txt}</span><div class="res-label">{label}</div><div class="res-pct">{pct:.1f}%</div><div class="res-desc">{desc}</div><div class="pills"><div class="pill">Skor: <b>{pred:.4f}</b></div><div class="pill">Threshold: <b>{THRESHOLD}</b></div><div class="pill">Model: <b>EfficientNet-B0</b></div></div></div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="gc-title">&#128293; Visualisasi Area Perhatian AI (Grad-CAM)</div>', unsafe_allow_html=True)
-
-    with st.spinner("Membuat visualisasi Grad-CAM..."):
-        try:
-            heatmap = make_gradcam(img_array, model)
-            fig_buf = make_gradcam_figure(img_bgr, heatmap)
-            st.image(fig_buf, use_column_width=True)
-            st.markdown('<div class="gc-desc">&#128308; <b>Area merah/hangat</b> = bagian yang paling mempengaruhi keputusan model. &#128309; <b>Biru/dingin</b> = pengaruh rendah.</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.warning(f"Visualisasi Grad-CAM tidak tersedia: {e}")
-
-    st.markdown('<div class="warn" style="margin-top:1.3rem;"><div class="warn-title">&#129658; Langkah Selanjutnya</div>Hasil di atas adalah <b>skrining awal berbasis AI</b> dan bukan diagnosis medis final. Jika kamu menemukan perubahan mencurigakan pada kulit, <b>segera periksakan diri ke dokter spesialis kulit (dermatologis)</b> untuk mendapatkan evaluasi klinis yang akurat.</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
+      pct      = pred * 100
+      is_high  = pred >= THRESHOLD
+      card_cls = "res-high" if is_high else "res-low"
+      bdg_cls  = "b-high" if is_high else "b-low"
+      bdg_txt  = "&#9888; Risiko Tinggi" if is_high else "&#10003; Risiko Rendah"
+      label    = "Risiko Tinggi Terdeteksi" if is_high else "Risiko Rendah Terdeteksi"
+      desc     = (
+            "Model mendeteksi karakteristik visual yang berkaitan dengan lesi kanker kulit. Segera konsultasikan ke dokter spesialis kulit untuk pemeriksaan lebih lanjut."
+            if is_high else
+            "Tidak ditemukan pola signifikan yang mencirikan kanker kulit pada gambar ini. Tetap lakukan pemeriksaan kulit secara rutin dan jaga kesehatan kulitmu."
+      )
+      st.markdown(f'<div class="res-card {card_cls}"><span class="res-badge {bdg_cls}">{bdg_txt}</span><div class="res-label">{label}</div><div class="res-pct">{pct:.1f}%</div><div class="res-desc">{desc}</div><div class="pills"><div class="pill">Skor: <b>{pred:.4f}</b></div><div class="pill">Threshold: <b>{THRESHOLD}</b></div><div class="pill">Model: <b>EfficientNet-B0</b></div></div></div>', unsafe_allow_html=True)
+      st.markdown('<div class="gc-title">&#128293; Visualisasi Area Perhatian AI (Grad-CAM)</div>', unsafe_allow_html=True)
+      
+      with st.spinner("Membuat visualisasi Grad-CAM..."):
+            try:
+                  heatmap = make_gradcam(img_array, model)
+                  fig_buf = make_gradcam_figure(img_bgr, heatmap)
+                  st.image(fig_buf, use_column_width=True)
+                  st.markdown('<div class="gc-desc">&#128308; <b>Area merah/hangat</b> = bagian yang paling mempengaruhi keputusan model. &#128309; <b>Biru/dingin</b> = pengaruh rendah.</div>', unsafe_allow_html=True)
+            except Exception as e:
+                  st.warning(f"Visualisasi Grad-CAM tidak tersedia: {e}")
+      st.markdown('<div class="warn" style="margin-top:1.3rem;"><div class="warn-title">&#129658; Langkah Selanjutnya</div>Hasil di atas adalah <b>skrining awal berbasis AI</b> dan bukan diagnosis medis final. Jika kamu menemukan perubahan mencurigakan pada kulit, <b>segera periksakan diri ke dokter spesialis kulit (dermatologis)</b> untuk mendapatkan evaluasi klinis yang akurat.</div>', unsafe_allow_html=True)
+      st.markdown('</div>', unsafe_allow_html=True)
     
 
 # ─────────────────────────────────────────────
