@@ -23,9 +23,8 @@ def log_visit():
             "visit"
         ])
     except Exception as e:
-        print("Gagal log:", e)  # biar app tetap jalan
+        st.error(f"Gagal log: {e}")  # biar app tetap jalan
         
-@st.cache_resource
 def connect_sheets():
     creds = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
@@ -45,9 +44,21 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+if st.button("TEST SHEETS"):
+    try:
+        sheet = connect_sheets()
+        sheet.append_row(["TEST", "OK"])
+        st.success("Berhasil nulis ke Sheets!")
+    except Exception as e:
+        st.error(f"Gagal: {e}")
+
+# Auto log visit
 if "logged" not in st.session_state:
-    log_visit()
-    st.session_state.logged = True
+    try:
+        log_visit()
+        st.session_state.logged = True
+    except Exception as e:
+        st.error(f"Log gagal: {e}")
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
