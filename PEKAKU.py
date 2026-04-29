@@ -16,16 +16,7 @@ from google.oauth2.service_account import Credentials
 import datetime
 import uuid
 
-def log_visit():
-    try:
-        sheet = connect_sheets()
-        sheet.append_row([
-            str(datetime.datetime.now()),
-            "visit"
-        ])
-    except Exception as e:
-        st.error(f"Gagal log: {e}")  # biar app tetap jalan
-        
+      
 def connect_sheets():
     creds = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
@@ -37,26 +28,21 @@ def connect_sheets():
     client = gspread.authorize(creds)
     return client.open("Histori_Kunjungan_PEKAKU").sheet1
 
-# log analisis sheets
-def log_analyze(pred, threshold):
+def log_event(event, result=None, score=None, percent=None):
     try:
         sheet = connect_sheets()
-
-        result = "high_risk" if pred >= threshold else "low_risk"
-        score = float(pred)
-        percent = score * 100
-
         sheet.append_row([
-            str(datetime.datetime.now()),   # timestamp
-            "analyze",                      # event
-            result,                         # hasil klasifikasi
-            f"{score:.4f}",                 # skor (0–1)
-            f"{percent:.2f}%",              # persen
-            st.session_state.user_id        # UUID user
+            str(datetime.datetime.now()),
+            st.session_state.get("user_id", "unknown"),
+            event,
+            result if result else "-",
+            score if score else "-",
+            percent if percent else "-"
         ])
-
     except Exception as e:
-        st.error(f"Gagal log analyze: {e}")
+        print("Gagal log:", e)
+
+
         
 # ─────────────────────────────────────────────
 # PAGE CONFIG
@@ -74,11 +60,8 @@ if "user_id" not in st.session_state:
     
 # Auto log visit
 if "logged" not in st.session_state:
-    try:
-        log_visit()
-        st.session_state.logged = True
-    except Exception as e:
-        st.error(f"Log gagal: {e}")
+    log_event("visit")
+    st.session_state.logged = True
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
@@ -319,7 +302,19 @@ if uploaded and do_analyze:
     with st.spinner("Menganalisis gambar..."):
         img_array, img_bgr = preprocess_image(image)
         pred = model.predict(img_array, verbose=0)[0][0]
-        log_analyze(pred, THRESHOLD)
+
+        pct = pred * 100
+        is_high = pred >= THRESHOLD
+        result_label = "high_risk" if is_high else "low_risk"
+
+        log_event(
+            event="analyze",
+            result=result_label,
+            score=float(pred),
+            percent=float(pct)
+        
+)
+)
     pct      = pred * 100
     is_high  = pred >= THRESHOLD
     card_cls = "res-high" if is_high else "res-low"
