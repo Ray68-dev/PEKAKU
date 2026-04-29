@@ -11,7 +11,7 @@ import io
 import os
 import base64
 from huggingface_hub import hf_hub_download
-
+import streamlit.components.v1 as components
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
@@ -23,18 +23,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-
-st.markdown("""
-<iframe srcdoc="
-<script async src='https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38'></script>
+components.html("""
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
 <script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-NNTWNYRC38');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-NNTWNYRC38');
 </script>
-" style="display:none;"></iframe>
-""", unsafe_allow_html=True)
+""", height=0)
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
