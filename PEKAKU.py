@@ -142,7 +142,7 @@ st.markdown("""
             cursor: pointer;
             box-shadow: 0 4px 18px rgba(124,58,237,0.4);
         ">
-        📘 Guidebook
+        Baca Panduan
         </button>
     </a>
 </div>
