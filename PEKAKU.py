@@ -44,25 +44,6 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-st.markdown("""
-<div style="text-align:center; margin-top:-2rem; margin-bottom:1.5rem;">
-    <a href="https://drive.google.com/file/d/14SgbBqAyLyjri9xm41EmP9WD_Fxk7kyT/view?usp=sharing" target="_blank">
-        <button style="
-            background: linear-gradient(135deg,#7c3aed,#a855f7);
-            color: white;
-            border: none;
-            padding: 0.65rem 1.6rem;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            box-shadow: 0 4px 18px rgba(124,58,237,0.4);
-        ">
-        Baca Panduan
-        </button>
-    </a>
-</div>
-""", unsafe_allow_html=True)
 
 # Auto log visit
 if "logged" not in st.session_state:
@@ -146,6 +127,26 @@ section[data-testid="stSidebar"]{display:none!important;}
 # ─────────────────────────────────────────────
 st.markdown(f'<div class="hero">{ICON_TAG}<div class="hero-title">PEKAKU</div><div class="hero-sub">Pendeteksi Risiko Kanker Kulit</div></div>', unsafe_allow_html=True)
 
+#Buku Panduan
+st.markdown("""
+<div style="text-align:center; margin-top:-2rem; margin-bottom:1.5rem;">
+    <a href="https://drive.google.com/file/d/14SgbBqAyLyjri9xm41EmP9WD_Fxk7kyT/view?usp=sharing" target="_blank">
+        <button style="
+            background: linear-gradient(135deg,#7c3aed,#a855f7);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.6rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(124,58,237,0.4);
+        ">
+        📘 Guidebook
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 # INTRO - Tentang
 # ─────────────────────────────────────────────
