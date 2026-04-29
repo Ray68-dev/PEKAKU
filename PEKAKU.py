@@ -11,8 +11,41 @@ import io
 import os
 import base64
 from huggingface_hub import hf_hub_download
-import streamlit.components.v1 as components
+import gspread
+from google.oauth2.service_account import Credentials
+import datetime
 
+def log_visit():
+    try:
+        sheet = connect_sheets()
+        sheet.append_row([
+            str(datetime.datetime.now()),
+            "visit"
+        ])
+    except Exception as e:
+        print("Gagal log:", e)  # biar app tetap jalan
+        
+@st.cache_resource
+def connect_sheets():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+    )
+    client = gspread.authorize(creds)
+    return client.open("Histori Kunjungan PEKAKU").sheet1def connect_sheets():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+    )
+    client = gspread.authorize(creds)
+    sheet = client.open("Histori Kunjungan PEKAKU").sheet1
+    return sheet
 # ─────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────
@@ -22,16 +55,9 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-
-components.html("""
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-NNTWNYRC38');
-</script>
-""", height=0)
+if "logged" not in st.session_state:
+    log_visit()
+    st.session_state.logged = True
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
