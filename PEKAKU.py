@@ -22,19 +22,17 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-if "ga_loaded" not in st.session_state:
-    st.session_state.ga_loaded = True
-    st.components.v1.html("""
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-NNTWNYRC38');
-    </script>
-    """, height=0)
+st.markdown("""
+<iframe srcdoc="
+<script async src='https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38'></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-NNTWNYRC38');
+</script>
+" style="display:none;"></iframe>
+""", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
