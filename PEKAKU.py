@@ -22,7 +22,7 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-<!-- Google tag (gtag.js) -->
+st.components.v1.html("""<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNTWNYRC38"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -30,7 +30,7 @@ st.set_page_config(
   gtag('js', new Date());
 
   gtag('config', 'G-NNTWNYRC38');
-</script>
+</script>""")
 # ─────────────────────────────────────────────
 # ICON BASE64
 # ─────────────────────────────────────────────
