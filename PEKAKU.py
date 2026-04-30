@@ -276,7 +276,7 @@ def make_gradcam_figure(img_bgr, heatmap, alpha=0.4):
 # UPLOAD
 # ─────────────────────────────────────────────
 st.markdown('<div class="section">', unsafe_allow_html=True)
-st.markdown('<div class="upload-title">&#128228; Unggah Gambar Kulit</div>', unsafe_allow_html=True)
+st.markdown('<div class="upload-title"; Unggah Gambar Kulit</div>', unsafe_allow_html=True)
 
 uploaded = st.file_uploader(
     "Format yang didukung: JPG, JPEG, PNG",
