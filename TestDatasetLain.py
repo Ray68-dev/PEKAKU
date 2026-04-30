@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # 1. PATHS
-BASE_DIR      = "/home/lintangarai/Documents/ISIC 2019"
+BASE_DIR      = "/home/user/Documents/ISIC 2019"
 METADATA_PATH = os.path.join(BASE_DIR, "train-metadata.csv")
 IMAGE_DIR     = os.path.join(BASE_DIR, "image")
 
