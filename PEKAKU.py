@@ -187,7 +187,7 @@ st.markdown("""
 # ─────────────────────────────────────────────
 st.markdown('<div class="warn"><div class="warn-title">&#9888; Perhatian Penting</div>PEKAKU adalah alat bantu skrining awal, <b>bukan alat diagnosis medis</b>. Hasil analisis AI tidak dapat menggantikan pemeriksaan langsung oleh dokter. Akurasi dipengaruhi oleh kualitas foto, sudut pengambilan gambar, dan kondisi pencahayaan.</div>', unsafe_allow_html=True)
 
-st.markdown('<div class="warn"><div class="warn-title">&#128203; Kapan Harus ke Dokter?</div>Jika hasil menunjukkan <b>risiko tinggi</b>, atau kamu menemukan perubahan pada kulit seperti bercak baru, warna tidak merata, tepi tidak beraturan, atau ukuran yang membesar — <b>jangan tunda, segera konsultasikan ke dokter spesialis kulit (dermatologis)</b> untuk evaluasi dan penanganan yang tepat.</div>', unsafe_allow_html=True)
+st.markdown('<div class="warn"><div class="warn-title">&#9888; Kapan Harus ke Dokter?</div>Jika hasil menunjukkan <b>risiko tinggi</b>, atau kamu menemukan perubahan pada kulit seperti bercak baru, warna tidak merata, tepi tidak beraturan, atau ukuran yang membesar — <b>jangan tunda, segera konsultasikan ke dokter spesialis kulit (dermatologis)</b> untuk evaluasi dan penanganan yang tepat.</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
