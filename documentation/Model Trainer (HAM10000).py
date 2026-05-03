@@ -15,7 +15,7 @@ import seaborn as sns
 import pickle
 
 # 1. PATHS
-BASE_DIR      = r"/home/lintangarai/Documents/Skin Cancer DATASET"
+BASE_DIR      = r"/home/user/Documents/Skin Cancer DATASET"
 METADATA_PATH = os.path.join(BASE_DIR, "HAM10000_metadata.csv")
 IMAGE_DIRS    = [
     os.path.join(BASE_DIR, "HAM10000_images_part_1"),
