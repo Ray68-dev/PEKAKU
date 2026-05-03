@@ -1,6 +1,6 @@
 # 🇮🇩 README (Bahasa Indonesia)
 
-## Deteksi Kanker Kulit dengan Deep Learning
+## Deteksi Risiko Kanker Kulit dengan Deep Learning
 
 Proyek ini merupakan model *deep learning* berbasis **Convolutional Neural Network (CNN)** menggunakan **EfficientNetB0** untuk mendeteksi kanker kulit dari citra dermatoskopi.
 
