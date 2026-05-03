@@ -38,17 +38,12 @@ def log_event(event, result=None, score=None, percent=None):
             user_id,
             event,
             result if result else "-",
-            score if score else "-",
-            percent if percent else "-"
+            score if score else "-"
         ])
     except Exception as e:
         print("Gagal log:", e)
 
-
-        
-# ─────────────────────────────────────────────
 # PAGE CONFIG
-# ─────────────────────────────────────────────
 st.set_page_config(
     page_title="PEKAKU — Pendeteksi Risiko Kanker Kulit",
     page_icon="pekaku_icon.png",
@@ -60,13 +55,12 @@ st.set_page_config(
 if "user_id" not in st.session_state:
     st.session_state.user_id = str(uuid.uuid4())
     
-# Auto log visit
+# AUTO LOG VISIT
 if "logged" not in st.session_state:
     log_event("visit")
     st.session_state.logged = True
-# ─────────────────────────────────────────────
+
 # ICON BASE64
-# ─────────────────────────────────────────────
 def get_icon_b64():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pekaku_icon.png")
     if os.path.exists(path):
@@ -80,9 +74,7 @@ ICON_TAG = (
     if ICON_B64 else ""
 )
 
-# ─────────────────────────────────────────────
 # CSS
-# ─────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
@@ -134,12 +126,10 @@ section[data-testid="stSidebar"]{display:none!important;}
 </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
 # HERO
-# ─────────────────────────────────────────────
 st.markdown(f'<div class="hero">{ICON_TAG}<div class="hero-title">PEKAKU</div><div class="hero-sub">Pendeteksi Risiko Kanker Kulit</div></div>', unsafe_allow_html=True)
 
-#Buku Panduan
+# BUKU PANDUAN
 st.markdown("""
 <div style="text-align:center; margin-top:-2rem; margin-bottom:1.5rem;">
     <a href="https://drive.google.com/file/d/14SgbBqAyLyjri9xm41EmP9WD_Fxk7kyT/view?usp=sharing" target="_blank">
@@ -159,18 +149,15 @@ st.markdown("""
     </a>
 </div>
 """, unsafe_allow_html=True)
-# ─────────────────────────────────────────────
-# INTRO - Tentang
-# ─────────────────────────────────────────────
+
+# TENTANG
 st.markdown('<div class="section">', unsafe_allow_html=True)
 
 st.markdown('<div class="section-label">Tentang Aplikasi</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="card"><b>PEKAKU</b> adalah sistem skrining berbasis kecerdasan buatan yang membantu mendeteksi potensi risiko kanker kulit dari gambar lesi atau bercak pada kulit. Sistem ini menggunakan model <b>EfficientNet-B0</b> yang telah dilatih untuk mengenali karakteristik visual lesi berisiko tinggi maupun rendah, dilengkapi visualisasi <b>Grad-CAM</b> untuk menunjukkan area yang menjadi fokus analisis AI.</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
 # STEPS
-# ─────────────────────────────────────────────
 st.markdown('<div class="section-label">Cara Menggunakan</div>', unsafe_allow_html=True)
 
 st.markdown("""
@@ -182,9 +169,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
 # WARNING
-# ─────────────────────────────────────────────
 st.markdown('<div class="warn"><div class="warn-title">&#9888; Perhatian Penting</div>PEKAKU adalah alat bantu skrining awal, <b>bukan alat diagnosis medis</b>. Hasil analisis AI tidak dapat menggantikan pemeriksaan langsung oleh dokter. Akurasi dipengaruhi oleh kualitas foto, sudut pengambilan gambar, dan kondisi pencahayaan.</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="warn"><div class="warn-title">&#9888; Kapan Harus ke Dokter?</div>Jika hasil menunjukkan <b>risiko tinggi</b>, atau kamu menemukan perubahan pada kulit seperti bercak baru, warna tidak merata, tepi tidak beraturan, atau ukuran yang membesar — <b>jangan tunda, segera konsultasikan ke dokter spesialis kulit (dermatologis)</b> untuk evaluasi dan penanganan yang tepat.</div>', unsafe_allow_html=True)
@@ -193,9 +178,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
 # LOAD MODEL
-# ─────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
 def load_model():
     path = hf_hub_download(repo_id="Ray-68/PEKAKU_01", filename="PEKAKU_0.1_model.keras")
@@ -208,9 +191,7 @@ with st.spinner("Memuat model AI dari Hugging Face..."):
         st.error(f"Gagal memuat model: {e}")
         st.stop()
 
-# ─────────────────────────────────────────────
 # HELPERS
-# ─────────────────────────────────────────────
 THRESHOLD = 0.31
 
 def preprocess_image(pil_img):
@@ -272,9 +253,7 @@ def make_gradcam_figure(img_bgr, heatmap, alpha=0.4):
     buf.seek(0)
     return buf
 
-# ─────────────────────────────────────────────
 # UPLOAD
-# ─────────────────────────────────────────────
 st.markdown('<div class="section">', unsafe_allow_html=True)
 st.markdown('<div class="upload-title"> Unggah Gambar Kulit</div>', unsafe_allow_html=True)
 
@@ -294,9 +273,7 @@ else:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
 # RESULT
-# ─────────────────────────────────────────────
 if uploaded and do_analyze:
       st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
       st.markdown('<div class="section">', unsafe_allow_html=True)
@@ -309,8 +286,7 @@ if uploaded and do_analyze:
       log_event(
             event="analyze",
             result=result_label,
-            score=float(pred),
-            percent=float(pct)
+            score=float(pred)
       )
       pct      = pred * 100
       is_high  = pred >= THRESHOLD
@@ -337,10 +313,7 @@ if uploaded and do_analyze:
       st.markdown('<div class="warn" style="margin-top:1.3rem;"><div class="warn-title">&#129658; Langkah Selanjutnya</div>Hasil di atas adalah <b>skrining awal berbasis AI</b> dan bukan diagnosis medis final. Jika kamu menemukan perubahan mencurigakan pada kulit, <b>segera periksakan diri ke dokter spesialis kulit (dermatologis)</b> untuk mendapatkan evaluasi klinis yang akurat.</div>', unsafe_allow_html=True)
       st.markdown('</div>', unsafe_allow_html=True)
     
-
-# ─────────────────────────────────────────────
 # FOOTER
-# ─────────────────────────────────────────────
 footer_icon = (
     f'<img src="data:image/png;base64,{ICON_B64}" style="width:28px;height:28px;border-radius:50%;opacity:0.45;vertical-align:middle;margin-right:6px;">'
     if ICON_B64 else ""
