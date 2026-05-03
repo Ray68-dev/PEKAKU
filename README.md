@@ -1,4 +1,4 @@
-# 🇮🇩 README (Bahasa Indonesia)
+# README
 
 ## Deteksi Risiko Kanker Kulit dengan Deep Learning
 
