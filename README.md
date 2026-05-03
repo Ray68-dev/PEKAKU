@@ -6,7 +6,6 @@ Proyek ini merupakan model *deep learning* berbasis **Convolutional Neural Netwo
 
 Dataset yang digunakan adalah **HAM10000 (Human Against Machine with 10,000 training images)**.
 
----
 
 ## Fitur Utama
 
@@ -21,7 +20,6 @@ Dataset yang digunakan adalah **HAM10000 (Human Against Machine with 10,000 trai
   * ROC Curve & AUC
   * Classification Report
 
----
 
 ## Arsitektur Model
 
@@ -33,7 +31,6 @@ Dataset yang digunakan adalah **HAM10000 (Human Against Machine with 10,000 trai
   * Dropout (0.5)
   * Output Sigmoid (Binary Classification)
 
----
 
 ## Evaluasi Model
 
@@ -50,7 +47,6 @@ Contoh output:
 Precision | Recall | F1-score
 ```
 
----
 
 ## Output
 
@@ -60,8 +56,6 @@ Setelah training:
 * `threshold.pkl` → threshold optimal
 * `confusion_matrix.png`
 * `roc_curve.png`
-
----
 
 ## Catatan
 
